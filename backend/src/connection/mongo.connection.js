@@ -20,11 +20,9 @@ module.exports = async () => {
             setTimeout(async () => {
                 console.log("reconnecting to mongo");
                 await mongoose.connect(mongoURI, {
-                    directConnection: true,
                 })
             }, 5000);
         })
     await mongoose.connect(mongoURI, {
-        directConnection: true,
     })
 }
