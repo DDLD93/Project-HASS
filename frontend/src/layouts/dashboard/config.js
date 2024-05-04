@@ -19,16 +19,16 @@ export const items = [
       </SvgIcon>
     ),
   },
-  // {
-  //   title: 'Overview',
-  //   path: '/overview',
-  //   role:["doctor","patient","admin"],
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <ChartBarIcon />
-  //     </SvgIcon>
-  //   )
-  // },
+  {
+    title: 'Overview',
+    path: '/overview',
+    role:["doctor","patient","admin"],
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
 
   {
     title: "Appointments",

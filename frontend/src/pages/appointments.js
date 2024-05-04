@@ -32,10 +32,10 @@ const columns = [
 const Page = () => {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
-  const [filteredRows, setFilteredRows] = useState("")
-  setFilteredRows
+  const [filteredRows, setFilteredRows] = useState([])
   const [filter, setfilter] = useState("")
   useEffect(() => {
+    setFilteredRows(rows)
     const filterRows = () => {
       const filteredRows = rows.filter((row) => {
         const doctorName = row?.doctor?.toLowerCase();
@@ -50,9 +50,9 @@ const Page = () => {
       });
       setFilteredRows(filteredRows);
     };
-  
+
     filterRows(); // Initial filter
-  
+
     return () => setFilteredRows(rows); // Reset filter when component unmounts
   }, [filter, rows]);
 
@@ -143,7 +143,7 @@ const Page = () => {
                 sx={{ maxWidth: 500 }}
               />
             </Card>
-            <HassTableAptm columns={columns} rows={rows} />
+            <HassTableAptm columns={columns} rows={filteredRows || rows} />
           </Stack>
         </Container>
       </Box>

@@ -14,6 +14,8 @@ import AccountModal from "src/sections/account/account-modal";
 import HassTable from "src/components/generic-table";
 import { configs } from "src/config-variables";
 import { useRouter } from "next/router";
+import { Card, OutlinedInput, InputAdornment } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 
 const now = new Date();
 
@@ -25,7 +27,7 @@ const columns = [
   { id: "status", label: "Status" },
   { id: 'actions', label: 'Actions' }
 ];
-function createData(id,user, email, userType, phone, status) {
+function createData(id, user, email, userType, phone, status) {
   return {
     id,
     user,
@@ -33,14 +35,39 @@ function createData(id,user, email, userType, phone, status) {
     userType,
     phone,
     status,
-    actions:"actions"
+    actions: "actions"
   };
 }
 
 const Page = () => {
   const [error, setError] = useState("");
   const router = useRouter();
+  const [rows, setRows] = useState([]);
+  const [open, setOpen] = useState(false);
   const [reFectch, setReFectch] = useState(true)
+  const [filteredRows, setFilteredRows] = useState([])
+  const [filter, setfilter] = useState("")
+  useEffect(() => {
+    setFilteredRows(rows)
+    const filterRows = () => {
+      const filteredRows = rows.filter((row) => {
+        const user = row?.user?.toLowerCase();
+        const email = row?.email?.toLowerCase();
+        const phone = row?.phone?.toString().toLowerCase();
+        const searchQuery = filter.toLowerCase();
+        return (
+          user.includes(searchQuery) ||
+          email.includes(searchQuery) ||
+          phone.includes(searchQuery)
+        );
+      });
+      setFilteredRows(filteredRows);
+    };
+
+    filterRows();
+
+    return () => setFilteredRows(rows); // Reset filter when component unmounts
+  }, [filter, rows]);
   useEffect(() => {
     const fetchData = async (query) => {
       try {
@@ -79,8 +106,7 @@ const Page = () => {
     }
   }, [reFectch]);
 
-  const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
+ 
 
   const handleClose = () => {
     setOpen(false);
@@ -132,8 +158,21 @@ const Page = () => {
                 </Stack>
               </Stack>
             </Stack>
-            <AccountSearch />
-            <HassTable columns={columns} rows={rows} setReFectch={setReFectch}/>
+            <Card sx={{ p: 2 }}>
+              <OutlinedInput
+                onChange={e => setfilter(e.target.value)}
+                fullWidth
+                placeholder="Search Users"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SvgIcon color="action" fontSize="small">
+                      <SearchIcon />
+                    </SvgIcon>
+                  </InputAdornment>
+                }
+                sx={{ maxWidth: 500 }}
+              />
+            </Card>            <HassTable columns={columns} rows={filteredRows || rows} setReFectch={setReFectch} />
           </Stack>
         </Container>
       </Box>

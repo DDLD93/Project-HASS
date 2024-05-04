@@ -66,7 +66,7 @@ const Page = () => (
               sx={{ height: "100%" }}
             />
           </Grid>
-          <Grid xs={12} md={6} lg={4}>
+          {/* <Grid xs={12} md={6} lg={4}>
             <OverviewLatestProducts
               products={[
                 {
@@ -169,7 +169,7 @@ const Page = () => (
               ]}
               sx={{ height: "100%" }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Box>

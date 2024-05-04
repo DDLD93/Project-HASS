@@ -9,8 +9,7 @@ module.exports = () => {
     api.post("/", verifyToken, async (req, res) => {
         try {
             let body = req.body;
-            body.patientId = req.user.id;
-            const { ok, data, message } = await AppointmentsController.setAppointment(body);
+            const { ok, data, message } = await AppointmentsController.setAppointment(req.user.id,body);
             if (ok) {
                 res.status(200).json({ ok, data })
             } else {

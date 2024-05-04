@@ -118,8 +118,10 @@ class AppointmentController {
     }
   }
 
-  async setAppointment(body) {
+  async setAppointment(patientAuthId, body) {
     try {
+      const patient = await PatientModel.findOne({ authId: patientAuthId });
+      body.patientId = patient._id
       body.end = add30Minutes(body.start);
       // Validate Doctor ID
       if (!(await this.isValidDoctor(body.doctorId))) {
@@ -275,10 +277,13 @@ class AppointmentController {
 
   async gellAllAppointments(id) {
     try {
+      const doctor = await DoctorModel.findOne({ authId: id });
+      const patient = await PatientModel.findOne({ authId: id })
+
       let appointment = await AppointmentModel.find({
         $or: [
-          { patientId: id },
-          { doctorId: id }
+          { patientId: patient?._id },
+          { doctorId: doctor?._id }
         ]
       });
       return { ok: true, data: appointment };
