@@ -46,7 +46,8 @@ function Page() {
   const [appointments, setAppointments] = useState([]);
   const [appointment, setAppointment] = useState({});
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [reFetch, setreFetch] = useState(false);
 
 
   const { role } = useBearStore((state) => state.user);
@@ -55,31 +56,32 @@ function Page() {
 
   const handleCloseAdd = () => {
     setOpenAdd(!openAdd);
+    setreFetch(state => !state)
   };
   const [openReview, setOpenReview] = useState(false);
   const handleCloseReview = () => {
     setOpenReview(!openReview);
   };
-  const handleCancel = () =>{
+  const handleCancel = () => {
     setLoading(true);
     fetch(`${configs.baseUrl}/appointment/${selectedAppointment._id}`, {
       method: "PUT",
       headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer "+token
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
       },
       body: JSON.stringify({
-          "status": "Canceled",
+        "status": "Canceled",
       })
-  }).then(res => res.json()).
+    }).then(res => res.json()).
       then(data => {
-          if (data.ok) {
+        if (data.ok) {
           setLoading(false);
           alert("Appointment canceled")
-          } else {
-              setLoading(false);
-              alert(data.message);
-          }
+        } else {
+          setLoading(false);
+          alert(data.message);
+        }
       }).catch(err => {
         alert(err.message)
         setLoading(false)
@@ -102,11 +104,11 @@ function Page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await fetch(`${configs.baseUrl}/appointment`,{
+        const result = await fetch(`${configs.baseUrl}/appointment`, {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-        },
+            "Authorization": "Bearer " + token
+          },
         });
         if (!result) {
           throw new Error("Network response was not ok");
@@ -124,7 +126,7 @@ function Page() {
       }
     };
     fetchData();
-  }, []);
+  }, [reFetch]);
 
   return (
     <>
@@ -132,7 +134,7 @@ function Page() {
         <title>Home </title>
       </Head>
       {/* <ReviewModal  /> */}
-      <AddModal open={openAdd} onClose={handleCloseAdd} />
+      <AddModal open={openAdd} onClose={handleCloseAdd} setreFetch={setreFetch} />
       <Box
         component="main"
         sx={{
@@ -226,32 +228,32 @@ function Page() {
                     Transaction ID: {selectedAppointment.transactionId}
                   </Typography> */}
                   <Typography variant="body2" color="textSecondary">
-                    Doctor Name: {appointment?.doctor?.fullName}
+                    Doctor Name: {appointment?.doctorId?.fullName}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Doctor Specialization: {appointment?.doctor?.specialization}
+                    Doctor Specialization: {appointment?.doctorId?.department}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Room ID: {selectedAppointment.roomId}
+                    Room Number: {appointment?.roomId?.number}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Start Time: {selectedAppointment.start.toLocaleString()}
+                    Start Time: {appointment?.start?.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
                     End Time: {selectedAppointment.end.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Status: {selectedAppointment.status}
+                    Status: {appointment?.status}
                   </Typography>
-                  {selectedAppointment.recurrence && (
+                  {appointment.recurrence && (
                     <Typography variant="body2" color="textSecondary">
                       Recurrence Frequency: {selectedAppointment.recurrence.frequency}
                     </Typography>
                   )}
                   <Stack direction="row" spacing={2}>
                     {/* {selectedAppointment.status === "Pending" && <Button variant="contained" sx={{ width: "35%", }}>Reschedule</Button>} */}
-                    {selectedAppointment.status === "Pending" && <Button onClick={handleCancel} disabled={loading} color="error" variant="contained" fullWidth>Cancel</Button>}
-                    {selectedAppointment.status === "Completed" && <ReviewModal openReview={openReview} setOpenReview={setOpenReview} Obj={selectedAppointment} />}
+                    {appointment.status === "Pending" && <Button onClick={handleCancel} disabled={loading} color="error" variant="contained" fullWidth>Cancel</Button>}
+                    {appointment.status === "Completed" && <ReviewModal openReview={openReview} setOpenReview={setOpenReview} Obj={selectedAppointment} />}
                   </Stack>
                 </Box>
               ) : (

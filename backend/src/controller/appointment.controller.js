@@ -258,7 +258,7 @@ class AppointmentController {
 
   async getSingleAppointment(id) {
     try {
-      let appointment = await AppointmentModel.findById(id).populate("doctor");
+      let appointment = await AppointmentModel.findById(id).populate("roomId doctorId");
       return { ok: true, data: appointment };
     } catch (error) {
       return { ok: false, message: error.message };
@@ -266,7 +266,7 @@ class AppointmentController {
   }
   async fecthAllAppointments() {
     try {
-      let appointment = await AppointmentModel.find();
+      let appointment = await AppointmentModel.find().populate("patientId doctorId roomId");
       return { ok: true, data: appointment };
     } catch (error) {
       return { ok: false, message: error.message };

@@ -77,13 +77,14 @@ module.exports = () => {
 
   api.delete("/:id", async (req, res) => {
     try {
-      let id = req.params.id;
-      const { ok, data, message } = await RoomsController.deleteRoom(id);
-      if (ok) {
-        res.status(200).json({ ok, data });
-      } else {
-        res.status(500).json({ ok, message });
-      }
+      let { id } = req.params;
+      await RoomsController.deleteRoom(id);
+      res.status(200).json({ ok: true, message: "room deleted" });
+      // if (ok) {
+      //   res.status(200).json({ ok, message });
+      // } else {
+      //   res.status(500).json({ ok, message });
+      // }
     } catch (error) {
       res.status(500).json({ ok: false, message: error.message });
     }

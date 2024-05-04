@@ -9,6 +9,7 @@ const roomSchema = new mongoose.Schema({
     bookings: [{
         startTime: { type: Date },
         endTime: { type: Date },
-    }]
+    }],
+    status: { type: String, enum: ["avialable", "not avialable"], default: "avialable" }
 }, { timestamps: true });
 module.exports = mongoose.model('Room', roomSchema);

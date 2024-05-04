@@ -79,9 +79,10 @@ class RoomsController {
     try {
       const room = await RoomsModel.findByIdAndDelete(id);
       if (room) {
-        return { ok: true, data: ` Room has been deleted` };
+        return { ok: true, message: `Room has been deleted` };
       }
     } catch (error) {
+      console.log(error.message)
       return { ok: false, message: error.message };
     }
   }
@@ -90,8 +91,9 @@ class RoomsController {
     for (let i = 0; i < 20; i++) {
       const newRoom = new RoomsModel({
         number: faker.number.int({ min: 1, max: 100 }),
-        type: faker.helpers.arrayElement(["Standard", "Deluxe", "Suite"]),
-        // bookings: this.generateFakeBookings()
+        type: faker.helpers.arrayElement(["Cosultation", "Cosultation", "Cosultation", "Cosultation", "Specialist", "Post Cosultation"]),
+        status: faker.helpers.arrayElement(["avialable", "avialable", "avialable", "avialable", "not avialable"]),
+
       });
       await newRoom.save();
       console.log(`Room number : ${i++} generated`);

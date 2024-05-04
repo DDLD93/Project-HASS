@@ -1,40 +1,61 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { subDays, subHours } from "date-fns";
-import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
-import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
-import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { AppointmentsTable } from "src/sections/appointments/appointments-table";
 import { AppointmentsSearch } from "src/sections/appointments/appointments-search";
-import { applyPagination } from "src/utils/apply-pagination";
+import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
+import { Card, InputAdornment, OutlinedInput } from '@mui/material';
 import AppointmentModal from "src/sections/appointments/appointments-modal";
-import HassTable from "src/components/generic-table";
 import { configs } from "src/config-variables";
+import HassTableAptm from "src/components/generic-table-aptm";
+import { fi } from "date-fns/locale";
 
-const now = new Date();
-function createData(room, time, status, createdAt, actions) {
+function createData(patient, doctor, room, time, status) {
   return {
+    patient,
+    doctor,
     room,
     time,
     status,
-    createdAt,
-    actions,
+    actions: "",
   };
 }
 
 const columns = [
+  { id: "patient", label: "Patient" },
+  { id: "doctor", label: "Doctor" },
   { id: "room", label: "Room" },
   { id: "time", label: "Time" },
   { id: "status", label: "Status" },
-  { id: "createdAt", label: "Created At" },
 ];
 
 const Page = () => {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
+  const [filteredRows, setFilteredRows] = useState("")
+  setFilteredRows
+  const [filter, setfilter] = useState("")
+  useEffect(() => {
+    const filterRows = () => {
+      const filteredRows = rows.filter((row) => {
+        const doctorName = row?.doctor?.toLowerCase();
+        const patientName = row?.patient?.toLowerCase();
+        const roomNumber = row?.room?.toString().toLowerCase();
+        const searchQuery = filter.toLowerCase();
+        return (
+          doctorName.includes(searchQuery) ||
+          patientName.includes(searchQuery) ||
+          roomNumber.includes(searchQuery)
+        );
+      });
+      setFilteredRows(filteredRows);
+    };
+  
+    filterRows(); // Initial filter
+  
+    return () => setFilteredRows(rows); // Reset filter when component unmounts
+  }, [filter, rows]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,14 +66,15 @@ const Page = () => {
         const result = await response.json();
         const { ok, data, message } = result;
         if (ok) {
-          const rowData = data.map((row) => {
-            return createData(row.room, row.start, row.status, row.createdAt, row.actions);
+          const rowDatas = data.map((row) => {
+            return createData(row?.patientId?.fullName, row.doctorId.fullName, row.roomId.number, row.start, row.status);
           });
-          setRows(rowData);
+          setRows(rowDatas);
+          console.log({ rowDatas })
         } else {
           setError(message);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchData();
   }, []);
@@ -101,8 +123,27 @@ const Page = () => {
                 </Stack>
               </Stack>
             </Stack>
-            <AppointmentsSearch />
-            <HassTable columns={columns} rows={rows} />
+            {/* search bar */}
+            <Card sx={{ p: 2 }}>
+              <OutlinedInput
+                defaultValue=""
+                fullWidth
+                placeholder="Search Appointment"
+                onChange={(e) => setfilter(e.target.value)}
+                startAdornment={(
+                  <InputAdornment position="start">
+                    <SvgIcon
+                      color="action"
+                      fontSize="small"
+                    >
+                      <MagnifyingGlassIcon />
+                    </SvgIcon>
+                  </InputAdornment>
+                )}
+                sx={{ maxWidth: 500 }}
+              />
+            </Card>
+            <HassTableAptm columns={columns} rows={rows} />
           </Stack>
         </Container>
       </Box>

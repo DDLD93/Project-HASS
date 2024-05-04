@@ -12,60 +12,48 @@ import useDataFetching from "src/hooks/use-fetch";
 import { configs } from "src/config-variables";
 import HassTable from "src/components/generic-table";
 import { useRouter } from "next/router";
-function createData(id, number, type, bookings) {
+import HassTableRoom from "src/components/generic-table-rooms";
+function createData(id, number, type, bookings, status) {
   return {
     id,
     number,
     type,
     bookings,
+    status,
+    actions: "actions"
   };
 }
 
 const columns = [
   { id: "number", label: "Number", minWidth: 170 },
-  { id: "type", label: "Type", minWidth: 100 },
+  { id: "type", label: "Room Type", minWidth: 100 },
   {
     id: "bookings",
-    label: "Current Bookings",
+    label: "Appointments",
     minWidth: 170,
     // align: 'right',
     format: (value) => value.length,
   },
-  { id: "createdAt", label: "Created At", minWidth: 170 },
+  { id: "status", label: "Status", minWidth: 170 },
+  { id: "actions", label: "Actions", minWidth: 170 },
+
 ];
 
 const Page = () => {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
+  const [reFectch, setReFectch] = useState(true)
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const router = useRouter();
-  // const [data, loading, error] = useDataFetching(`${configs.baseUrl}/room`);
-  // console.log({ data, loading, error });
-
   const handleClose = () => {
     setOpen(false);
   };
-  // if (error) {
-  //   return <h1>{error}</h1>
-  // }
-  // if (loading) {
-  //   return <h1>Loading</h1>
-  // }
-  // useEffect(() => {
-  //   (() => {
-  //     const rowData = data.map(row => {
-  //       return createData(row._id, row.number, row.type, row.bookings.length);
-  //     })
-  //     setRows(rowData)
-  //   })()
-
-  // }, [])
 
   useEffect(() => {
-    const fetchData = async (query) => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${configs.baseUrl}/room?query=${query}`);
+        const response = await fetch(`${configs.baseUrl}/room`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -73,7 +61,7 @@ const Page = () => {
         const { ok, data, message } = result;
         if (ok) {
           const rowData = data.map((row) => {
-            return createData(row._id, row.number, row.type, row.bookings.length);
+            return createData(row._id, row.number, row.type, row.bookings.length, row.status);
           });
           setRows(rowData);
         } else {
@@ -83,19 +71,12 @@ const Page = () => {
         setError(error.message);
       }
     };
-
-    const { query } = router.query;
-
-    if (query) {
-      fetchData(query);
-    } else {
-      fetchData("");
-    }
-  }, [router.query]);
+      fetchData();
+  }, [reFectch]);
 
   return (
     <>
-      <RoomModal open={open} onClose={handleClose} />
+      <RoomModal open={open} onClose={handleClose} setReFectch={setReFectch} />
       <Head>
         <title>Rooms</title>
       </Head>
@@ -149,7 +130,7 @@ const Page = () => {
               </div>
             </Stack>
             <RoomSearch />
-            <HassTable columns={columns} rows={rows} />
+            <HassTableRoom columns={columns} rows={rows} setReFectch={setReFectch} />
           </Stack>
         </Container>
       </Box>

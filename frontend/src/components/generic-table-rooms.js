@@ -14,7 +14,7 @@ import { useState } from 'react';
 
 
 
-export default function HassTable({ columns, rows ,setReFectch}) {
+export default function HassTableRoom({ columns, rows ,setReFectch}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -57,7 +57,7 @@ export default function HassTable({ columns, rows ,setReFectch}) {
                           {/* {column.format && typeof value === 'number'
                             ? column.format(value)
                             : value} */}
-                          {value === "actions" ? <StatusAction id={row.id} status={row.status} setReFectch={setReFectch} /> : value}
+                          {value === "actions" ? <DeleteAction id={row.id} setReFectch={setReFectch} /> : value}
                         </TableCell>
                       );
                     })}
@@ -80,16 +80,15 @@ export default function HassTable({ columns, rows ,setReFectch}) {
   );
 }
 
-const StatusAction = ({ id, status,setReFectch }) => {
+const DeleteAction = ({ id,setReFectch }) => {
   const [loading, setloading] = useState(false)
   function handleOnAction() {
     setloading(true)
-    fetch(`${configs.baseUrl}/auth/${id}`, {
-      method: "PUT",
+    fetch(`${configs.baseUrl}/room/${id}`, {
+      method: "DELETE",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ status: status !== "active" ? "active" : "disable" })
     }).then(res => res.json()).
       then(respose => {
         setloading(false)
@@ -101,5 +100,5 @@ const StatusAction = ({ id, status,setReFectch }) => {
       })
 
   }
-  return (<LoadingButton loading={loading} color={status !== "active" ? "success" : "error"} onClick={handleOnAction} variant='contained' size='small'>{status !== "active" ? "Activate" : "Suspend"}</LoadingButton>)
+  return (<LoadingButton loading={loading} color={"error"} onClick={handleOnAction} variant='contained' size='small'>Delete</LoadingButton>)
 }

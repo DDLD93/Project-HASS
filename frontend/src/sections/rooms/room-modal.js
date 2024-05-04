@@ -40,7 +40,7 @@ const roomTypes = [
     { name: "Post-Consultation Rooms", value: "Post-Consultation " },
 
 ]
-export default function RoomModal({ open, onClose }) {
+export default function RoomModal({ open, onClose, setReFectch }) {
     // const logout = useBearStore((state) => state.logout);
 
     return (
@@ -58,6 +58,7 @@ export default function RoomModal({ open, onClose }) {
                     </Grid>
                     {<Form
                         close={onClose}
+                        setReFectch={setReFectch}
                     />}
                 </Grid>
             </Box>
@@ -65,7 +66,7 @@ export default function RoomModal({ open, onClose }) {
     );
 }
 
-function Form({ close }) {
+function Form({ close,setReFectch }) {
     const formik = useFormik({
         initialValues: {
             roomNumber: "",
@@ -95,9 +96,10 @@ function Form({ close }) {
                 console.log("data", data);
 
                 let response = await data.json()
-                
+
                 if (data.status === 200) {
                     window.alert("Room was registered Successfully")
+                    setReFectch(state => !state)
                     setTimeout(() => {
                         close()
                     }, 1000);

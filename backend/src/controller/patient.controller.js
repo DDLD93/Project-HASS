@@ -1,25 +1,40 @@
 const PatientsModel = require("../model/patient.model");
+const AuthCtrl = require("../controller/auth.controller");
 const AuthModel = require("../model/auth.model");
+
 const { faker } = require('@faker-js/faker');
 
 class PatientsController {
-    constructor() { 
+    constructor() {
         // this.#init()
     }
-    async #init(){
+    async #init() {
         try {
             await this.createPatients()
         } catch (error) {
-            
+
         }
     }
 
     async registerPatient(body) {
         try {
             const patient = new PatientsModel(body);
-            let result = await patient.save();
-            await AuthModel.findByIdAndUpdate(body.authId, { role: "patient" });
-            return { ok: true, data: result };
+            await patient.save();
+            const { data:user } = await AuthCtrl.updateUser(body.authId, { role: "patient" });
+            let token = AuthCtrl.encodeToken(
+                {
+                    email: user.email,
+                    role: user.role,
+                    id: user._id,
+                },
+                { expiresIn: "5h" }
+            );
+
+            let payload = {
+                user,
+                token,
+            };
+            return { ok: true, data: payload };
         } catch (error) {
             return { ok: false, message: error.message }
         }
@@ -35,7 +50,7 @@ class PatientsController {
     }
     async getPatient(id) {
         try {
-            let patient = await PatientsModel.findOne({authId:id});
+            let patient = await PatientsModel.findOne({ authId: id });
             return { ok: true, data: patient };
         } catch (error) {
             return { ok: false, message: error.message };
@@ -68,13 +83,13 @@ class PatientsController {
             return { ok: false, message: error.message };
         }
     }
-    async  createPatients() {
+    async createPatients() {
         try {
-            const authRecords = await AuthModel.find({role:"patient"});
-    
+            const authRecords = await AuthModel.find({ role: "patient" });
+
             for (let i = 0; i < authRecords.length; i++) {
                 const authRecord = authRecords[i];
-    
+
                 const newPatient = new PatientsModel({
                     authId: authRecord._id, // Assuming _id is used as the reference to authId
                     firstName: faker.person.firstName(),
@@ -86,11 +101,11 @@ class PatientsController {
                     address: faker.location.streetAddress(),
                     medicalHistory: ["None"]
                 });
-    
+
                 await newPatient.save();
                 console.log(`Patient created for authentication ID: ${authRecord._id}`);
             }
-    
+
             console.log('Patients created for all authentication records');
         } catch (error) {
             console.error('Error creating patients:', error.message);

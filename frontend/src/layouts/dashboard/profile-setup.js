@@ -43,6 +43,7 @@ import { configs } from "src/config-variables";
 import { useBearStore } from "src/contexts/store";
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useRouter } from "next/router";
 const style = {
   position: "absolute",
   top: "50%",
@@ -60,6 +61,7 @@ const style = {
 export default function ProfileSetup() {
   const [role, setRole] = React.useState("");
   const logout = useBearStore((state) => state.logout);
+ 
   return (
     <Modal
       open={true}
@@ -112,8 +114,9 @@ export default function ProfileSetup() {
 }
 
 function Doctor() {
-  const { token ,logout} = useBearStore();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const { token ,login} = useBearStore();
+  const router = useRouter();
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -124,18 +127,36 @@ function Doctor() {
       },
     },
   };
-  const specializations = [
-    'Cardiology',
-    'Neurology',
-    'Orthopedics',
-    'Dermatology',
-    'Oncology',
-    'Pediatrics',
-    'Gastroenterology',
-    'Ophthalmology',
-    'Psychiatry',
-    'Endocrinology',
-  ];
+  const specializations = ["Cardiologist",
+  "Gastroenterologist",
+  "Neurologist",
+  "Oncologist",
+  "Pediatrician",
+  "Psychiatrist",
+  "Surgeon",
+  "Urologist",
+  "Endocrinologist",
+  "Dermatologist",
+  "Allergist",
+  "Anesthesiologist",
+  "Hematologist",
+  "Nephrologist",
+  "Ophthalmologist",
+  "Orthopedic Surgeon",
+  "Otolaryngologist",
+  "Pathologist",
+  "Pulmonologist",
+  "Radiologist",
+  "Rheumatologist",
+  "Cardiothoracic Surgeon",
+  "Dentist",
+  "Gynecologist",
+  "Hepatologist",
+  "Osteopath",
+  "Plastic Surgeon",
+  "Podiatrist",
+  "Thoracic Surgeon",
+  "Vascular Surgeon"];
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -156,9 +177,7 @@ function Doctor() {
       lastName: Yup.string().max(255).required("Last Name is required"),
       department: Yup.string().max(50).required("Department is required"),
       specialization: Yup.array().required("Specialization is required"),
-      contactNumber: Yup.string().matches(/^\+(234)?[789][01]\d{8}$/, {
-        message: "Invalid Nigerian phone number format (+2348012345678)",
-      }).required("Phone is required"),
+      contactNumber: Yup.string().required("Phone is required"),
       // contactNumber: Yup.string().matches(/^\+(44)?[7-9]\d{9}$/, {
       //   message: "Invalid British phone number format (+447123456789)",
       // }).required("Phone is required"),
@@ -191,10 +210,10 @@ function Doctor() {
           // Successful login
           setLoading(false);
           console.log("profile setup successful:", response.data);
-          alert("Success!!! please log back in again");
-          setTimeout(() => {
-            logout();
-          }, 5000);
+          const { user, token } = response.data.data
+          console.log({user,token})
+          login(user, token);
+          router.push("/");
         } else {
           helpers.setStatus({ success: false });
           helpers.setErrors({ submit: "Unexpected status code:" + response.status });
@@ -362,8 +381,10 @@ function Doctor() {
 }
 
 function Patient() {
-  const { token ,logout} = useBearStore();
   const [loading, setLoading] = useState(false)
+  const { token ,login} = useBearStore();
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -407,10 +428,10 @@ function Patient() {
         if (response.status === 201) {
           console.log("profile setup successful:", response.data);
           setLoading(false);
-          alert("Success!!! please log back in again");
-          setTimeout(() => {
-            logout();
-          }, 5000);
+          const { user, token } = response.data.data;
+          login(user, token);
+          router.push("/");
+          // alert("Success!!! please log back in again");
         } else {
           helpers.setStatus({ success: false });
           helpers.setErrors({ submit: "Unexpected status code:" + response.status });

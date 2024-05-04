@@ -35,7 +35,7 @@ server.listen(appPort, () => {
 });
 
 setTimeout(() => {
-  require("./controller/mockData.controller");
+  // require("./controller/mockData.controller");
 }, 10000);
 
 module.exports = { app };

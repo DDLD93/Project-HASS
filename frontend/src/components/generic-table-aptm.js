@@ -14,7 +14,7 @@ import { useState } from 'react';
 
 
 
-export default function HassTable({ columns, rows ,setReFectch}) {
+export default function HassTableAptm({ columns, rows, setReFectch }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -52,6 +52,7 @@ export default function HassTable({ columns, rows ,setReFectch}) {
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                     {columns.map((column) => {
                       const value = row[column.id];
+                      console.log({ value })
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {/* {column.format && typeof value === 'number'
@@ -80,7 +81,7 @@ export default function HassTable({ columns, rows ,setReFectch}) {
   );
 }
 
-const StatusAction = ({ id, status,setReFectch }) => {
+const StatusAction = ({ id, status, setReFectch }) => {
   const [loading, setloading] = useState(false)
   function handleOnAction() {
     setloading(true)
@@ -93,7 +94,7 @@ const StatusAction = ({ id, status,setReFectch }) => {
     }).then(res => res.json()).
       then(respose => {
         setloading(false)
-        setReFectch(state=>!state)
+        setReFectch(state => !state)
         alert(respose.message);
       }).catch(err => {
         setloading(false);

@@ -1,4 +1,5 @@
 const DoctorsModel = require("../model/doctor.model");
+const AuthCtrl = require("../controller/auth.controller");
 const AuthModel = require("../model/auth.model");
 const { faker } = require('@faker-js/faker');
 
@@ -14,9 +15,22 @@ class DoctorsController {
     async registerDoctor(body) {
         try {
             const doctor = new DoctorsModel(body);
-            let result = await doctor.save();
-            await AuthModel.findByIdAndUpdate(body.authId, { role: "doctor" });
-            return { ok: true, data: result };
+            await doctor.save();
+            const { data:user } = await AuthCtrl.updateUser(body.authId, { role: "doctor" });
+            let token = AuthCtrl.encodeToken(
+                {
+                    email: user.email,
+                    role: user.role,
+                    id: user._id,
+                },
+                { expiresIn: "5h" }
+            );
+
+            let payload = {
+                user,
+                token,
+            };
+            return { ok: true, data: payload };
         } catch (error) {
             return { ok: false, message: error.message }
         }

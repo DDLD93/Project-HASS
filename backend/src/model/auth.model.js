@@ -24,6 +24,11 @@ const authSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    token: {
+      access_token: { type: String },
+      refresh_token: { type: String },
+      expiry_date: { type: Date },
+    },
     role: {
       type: String,
       // required: [true, 'Role is required'],
@@ -33,6 +38,12 @@ const authSchema = new mongoose.Schema(
       type: String,
       required: [true, "Auth type is required"],
       enum: ["local"],
+    },
+    status: {
+      type: String,
+      required: [true, "Status is required"],
+      enum: ["pending", "active", "disable"],
+      default: "active"
     },
     isVerified: {
       type: Boolean,
@@ -49,11 +60,7 @@ authSchema.pre("save", function (next, opt) {
     this.isVerified = true;
   }
 
-  // U can uncomment this if u so wish
 
-  // if (this.role == "admin" && !isAdmin) {
-  //   throw new Error("You are not allow to create with user type [admin]");
-  // }
 
   if (skipHash) {
     console.log("Skipping password hash!!!");

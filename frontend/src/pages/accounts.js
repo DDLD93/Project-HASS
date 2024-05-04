@@ -23,25 +23,28 @@ const columns = [
   { id: "userType", label: "User Type" },
   { id: "phone", label: "Phone" },
   { id: "status", label: "Status" },
-  // { id: 'actions', label: 'Actions' }
+  { id: 'actions', label: 'Actions' }
 ];
-function createData(user, email, userType, phone, status) {
+function createData(id,user, email, userType, phone, status) {
   return {
+    id,
     user,
     email,
     userType,
     phone,
     status,
+    actions:"actions"
   };
 }
 
 const Page = () => {
   const [error, setError] = useState("");
   const router = useRouter();
+  const [reFectch, setReFectch] = useState(true)
   useEffect(() => {
     const fetchData = async (query) => {
       try {
-        const response = await fetch(`${configs.baseUrl}/auth/users?query=${query}`);
+        const response = await fetch(`${configs.baseUrl}/auth/users`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -50,11 +53,12 @@ const Page = () => {
         if (ok) {
           const rowData = data.map((row) =>
             createData(
-              row.name,
+              row.authId._id,
+              row.fullName,
               row.email,
-              row.role,
-              row.phone,
-              row.isVerified ? "Active" : "Not Active"
+              row.authId.role,
+              row.contactNumber,
+              row.authId.status
             )
           );
           setRows(rowData);
@@ -73,7 +77,7 @@ const Page = () => {
     } else {
       fetchData("");
     }
-  }, [router.query]);
+  }, [reFectch]);
 
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
@@ -129,7 +133,7 @@ const Page = () => {
               </Stack>
             </Stack>
             <AccountSearch />
-            <HassTable columns={columns} rows={rows} />
+            <HassTable columns={columns} rows={rows} setReFectch={setReFectch}/>
           </Stack>
         </Container>
       </Box>

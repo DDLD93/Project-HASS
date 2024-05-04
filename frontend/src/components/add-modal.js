@@ -185,7 +185,13 @@ export default function AddModal({ open, onClose }) {
                     then(data => {
                         if (data.ok) {
                         setLoading(false);
+                        window.open('https://buy.stripe.com/test_00gdUc89eb8g6Ck6oo', '_newtab');
                         onClose();
+                        setActiveStep(0)
+                        setDoctor(null)
+                        setDateTime(null)
+                        setNotes(null)
+                        setSpecialization(null)
                         } else {
                             setLoading(false);
                             alert(data.message);

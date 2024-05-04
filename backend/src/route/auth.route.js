@@ -131,9 +131,23 @@ module.exports = () => {
 
   api.get("/users", async (req, res) => {
     try {
-      const query = req.query.query;
+      const { ok, data, message } = await AuthContorller.getUsers();
+      if (ok) {
+        res.status(200).json({ ok, message, data });
+      } else {
+        res.status(500).json({ ok, message, data });
+      }
+    } catch (error) {
+      res.status(500).json({ ok: false, message: error.message });
+    }
+  });
 
-      const { ok, data, message } = await AuthContorller.getUsers(query);
+  api.put("/:id", async (req, res) => {
+    try {
+      const {id} = req.params
+  
+      const body = req.body
+      const { ok, data, message } = await AuthContorller.updateUser(id,body);
       if (ok) {
         res.status(200).json({ ok, message, data });
       } else {

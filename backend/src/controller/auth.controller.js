@@ -1,4 +1,7 @@
 const AuthModel = require("../model/auth.model");
+const DoctorModel = require("../model/doctor.model");
+const PatientModel = require("../model/patient.model");
+
 const { faker } = require("@faker-js/faker");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config");
@@ -127,8 +130,8 @@ class ControllerAuth {
       if (!isValid) {
         throw new Error("Invalid password");
       }
-      if (!user.isVerified) {
-        throw new Error("Not Authorize, please verify account");
+      if (user.status !== "active") {
+        throw new Error("Account suspended");
       }
       let token = this.encodeToken(
         {
@@ -149,23 +152,34 @@ class ControllerAuth {
     }
   }
 
-  async getUsers(query) {
-    if (query || query == undefined) {
-      const regex = new RegExp(query, "i");
-      const searchedUsers = await AuthModel.find({ role: { $regex: regex } });
+  async getUsers() {
+    const patients = await DoctorModel.find().populate("authId");
+    const doctors = await PatientModel.find().populate("authId");
+    return {
+      ok: true,
+      data: [...patients, ...doctors],
+      message: "Users fetched successfully",
+    };
+
+  }
+
+  async updateUser(id, newData) {
+    try {
+      console.log({id, newData})
+      const user = await AuthModel.findByIdAndUpdate(id, newData, { new: true });
+      console.log({user})
       return {
         ok: true,
-        data: searchedUsers,
-        message: "Users fetched successfully",
+        data: user,
+        message: "Users updated successfully",
       };
-    } else {
-      const users = await AuthModel.find();
+    } catch (error) {
       return {
-        ok: true,
-        data: users,
-        message: "Users fetched successfully",
+        ok: false,
+        message: error.message,
       };
     }
+
   }
 
   encodeToken(payload, options = {}) {
@@ -217,6 +231,7 @@ class ControllerAuth {
           ]),
           authType: faker.helpers.arrayElement(["local"]),
           isVerified: true,
+          status:"active"
         });
         await newUser.save();
         console.log(`User ${i + 1} created successfully`);
