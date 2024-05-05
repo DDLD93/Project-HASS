@@ -3,6 +3,8 @@ const DoctorModel = require("../model/doctor.model");
 const PatientModel = require("../model/patient.model");
 const RatingModel = require("../model/review.model");
 const RoomModel = require("../model/room.model");
+const OpenAICtrl = require("../controller/open.controller");
+const GoogleCtrl = require("../controller/google.controller");
 const { io } = require("../server");
 
 class AppointmentController {
@@ -59,17 +61,17 @@ class AppointmentController {
     }
   }
 
-  async createRatingForAppointment({ appointmentId, DoctorId, patientId }) {
+  async createRatingForAppointment({ appointmentId, doctorId, patientId }) {
     try {
       const newRating = new RatingModel({
         appointmentId,
-        DoctorId,
+        doctorId,
         patientId,
       });
       await newRating.save();
       return { ok: true };
     } catch (error) {
-      return { ok: false, message: error.message };
+      throw new Error(error.message)
     }
   }
 
@@ -156,20 +158,43 @@ class AppointmentController {
       if (new Date(body.start).getTime() >= new Date(body.end).getTime()) {
         throw new Error("Start time must be before end time");
       }
-
+      // get purpose embeddings
+      const { ok, data, message } = await OpenAICtrl.getEmbeddings({ input: body.purpose })
+      if (!ok) throw new Error(message)
+      body.purposeEmbedding = data;
       const appointment = new AppointmentModel(body);
 
       let result = await appointment.save();
 
-      // result = result.toObject();
+      result = result.toObject();
       // await this.createRatingForAppointment(result);
-      // result.checkoutUrl = stripeRes.url;
-      // mockPaymentEvent(result._id);
+      const event = {
+        summary: 'HASS Apoointment',
+        location: 'HASS Office',
+        description: 'A medical appointment ',
+        start: {
+          dateTime: result.start,
+          timeZone: 'America/Los_Angeles',
+        },
+        end: {
+          dateTime: result.end,
+          timeZone: 'America/Los_Angeles',
+        },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'email', minutes: 24 * 60 },
+            { method: 'popup', minutes: 10 },
+          ],
+        },
+      };
+      // const response = await GoogleCtrl.addEvent(patientAuthId, event);
       return { ok: true, data: result };
     } catch (error) {
       return { ok: false, message: error.message };
     }
   }
+
   async getRoomAvailable(startTime, endTime) {
     try {
       const availableRooms = await RoomModel.findOne({
@@ -218,8 +243,6 @@ class AppointmentController {
         { start: { $gte: startTime }, end: { $lte: endTime } },
       ],
     });
-    console.log({ overlap });
-
     return !overlap;
   }
 

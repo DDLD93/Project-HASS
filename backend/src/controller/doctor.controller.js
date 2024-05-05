@@ -143,7 +143,7 @@ class DoctorsController {
                     department: faker.helpers.arrayElement(specializations),
                     specialization: [faker.helpers.arrayElement(specializations)],
                     contactNumber: faker.phone.number(),
-                    email: faker.internet.email(),
+                    email: authRecord.email,
                     workingHours: {
                         start: "09:00",
                         end: "18:00"

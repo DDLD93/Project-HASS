@@ -12,7 +12,7 @@ export const items = [
   {
     title: "Home",
     path: "/",
-    role: ["doctor", "patient",],
+    role: ["doctor", "patient"],
     icon: (
       <SvgIcon fontSize="small">
         <HomeIcon />
@@ -22,7 +22,7 @@ export const items = [
   {
     title: 'Overview',
     path: '/overview',
-    role:["doctor","patient","admin"],
+    role:["admin"],
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />
@@ -33,7 +33,7 @@ export const items = [
   {
     title: "Appointments",
     path: "/appointments",
-    role: [ "admin"],
+    role: ["admin"],
     icon: (
       <SvgIcon fontSize="small">
         <CalendarDaysIcon />

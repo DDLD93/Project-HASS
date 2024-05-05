@@ -44,18 +44,19 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'End time is required'],
         validate: [function (v) {
-            return this.start && v > this.start; 
+            return this.start && v > this.start;
         }, 'End time must be after start time']
     },
     purpose: { type: String },
+    purposeEmbeddings: { type: [mongoose.Schema.Types.Number] },
     status: {
         type: String,
-        default: 'Pending',
+        default: 'Confirmed',
         enum: ['Pending', 'Confirmed', 'Canceled', 'Completed']
     },
     notes: { type: String },
     recurrence: RecurrenceSchema,
-    
+
 }, { timestamps: true });
 
 appointmentSchema.virtual('isRecurring').get(function () {

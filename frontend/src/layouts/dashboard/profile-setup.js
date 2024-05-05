@@ -61,7 +61,7 @@ const style = {
 export default function ProfileSetup() {
   const [role, setRole] = React.useState("");
   const logout = useBearStore((state) => state.logout);
- 
+
   return (
     <Modal
       open={true}
@@ -71,43 +71,43 @@ export default function ProfileSetup() {
       disableEnforceFocus
     >
       <Box sx={style}>
-      <TransitionGroup >
-        <Grid height={"100%"} container spacing={1.5}>
-          <Grid display={"flex"} justifyContent={"space-between"} xs={12} md={12} lg={12}>
-            <ArrowBackIcon onClick={() => setRole("")} />
-            <PowerSettingsNewIcon sx={{ color: "red", ":hover": "pointer" }} onClick={logout} />
+        <TransitionGroup >
+          <Grid height={"100%"} container spacing={1.5}>
+            <Grid display={"flex"} justifyContent={"space-between"} xs={12} md={12} lg={12}>
+              <ArrowBackIcon onClick={() => setRole("")} />
+              <PowerSettingsNewIcon sx={{ color: "red", ":hover": "pointer" }} onClick={logout} />
+            </Grid>
+
+            {role == "" && (<Grid height={"80%"} display={"flex"} justifyContent={"center"} flexDirection={"column"} gap={3} xs={12} md={12} lg={12}>
+
+              <Button onClick={() => setRole("patient")} variant="outlined">
+                <Grid>
+                  <Typography m={1} variant="h3">
+                    Patient
+                  </Typography>
+                  <Typography variant="caption">
+                    Setup to book a specialist appointment for personalized care
+                  </Typography>
+                </Grid>
+              </Button>
+
+              <Button onClick={() => setRole("doctor")} variant="outlined">
+                <Grid>
+                  <Typography m={2} variant="h3">
+                    Doctor
+                  </Typography>
+                  <Typography variant="caption">
+                    Setup as a specialist to connect with patients seeking your specialized skills.
+                  </Typography>
+                </Grid>
+              </Button>
+
+
+            </Grid>)}
+            {role == "doctor" && <Doctor />}
+            {role == "patient" && <Patient />}
           </Grid>
-
-          {role == "" && (<Grid height={"80%"} display={"flex"} justifyContent={"center"} flexDirection={"column"} gap={3} xs={12} md={12} lg={12}>
-
-            <Button onClick={() => setRole("patient")} variant="outlined">
-              <Grid>
-                <Typography m={1} variant="h3">
-                  Patient
-                </Typography>
-                <Typography variant="caption">
-                  Setup to book a specialist appointment for personalized care
-                </Typography>
-              </Grid>
-            </Button>
-
-            <Button onClick={() => setRole("doctor")} variant="outlined">
-              <Grid>
-                <Typography m={2} variant="h3">
-                  Doctor
-                </Typography>
-                <Typography variant="caption">
-                  Setup as a specialist to connect with patients seeking your specialized skills.
-                </Typography>
-              </Grid>
-            </Button>
-
-
-          </Grid>)}
-          {role == "doctor" && <Doctor />}
-          {role == "patient" && <Patient />}
-        </Grid>
-      </TransitionGroup>
+        </TransitionGroup>
       </Box>
     </Modal>
   );
@@ -115,7 +115,7 @@ export default function ProfileSetup() {
 
 function Doctor() {
   const [loading, setLoading] = useState(false);
-  const { token ,login} = useBearStore();
+  const { user: userObj, token, login } = useBearStore();
   const router = useRouter();
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -128,35 +128,35 @@ function Doctor() {
     },
   };
   const specializations = ["Cardiologist",
-  "Gastroenterologist",
-  "Neurologist",
-  "Oncologist",
-  "Pediatrician",
-  "Psychiatrist",
-  "Surgeon",
-  "Urologist",
-  "Endocrinologist",
-  "Dermatologist",
-  "Allergist",
-  "Anesthesiologist",
-  "Hematologist",
-  "Nephrologist",
-  "Ophthalmologist",
-  "Orthopedic Surgeon",
-  "Otolaryngologist",
-  "Pathologist",
-  "Pulmonologist",
-  "Radiologist",
-  "Rheumatologist",
-  "Cardiothoracic Surgeon",
-  "Dentist",
-  "Gynecologist",
-  "Hepatologist",
-  "Osteopath",
-  "Plastic Surgeon",
-  "Podiatrist",
-  "Thoracic Surgeon",
-  "Vascular Surgeon"];
+    "Gastroenterologist",
+    "Neurologist",
+    "Oncologist",
+    "Pediatrician",
+    "Psychiatrist",
+    "Surgeon",
+    "Urologist",
+    "Endocrinologist",
+    "Dermatologist",
+    "Allergist",
+    "Anesthesiologist",
+    "Hematologist",
+    "Nephrologist",
+    "Ophthalmologist",
+    "Orthopedic Surgeon",
+    "Otolaryngologist",
+    "Pathologist",
+    "Pulmonologist",
+    "Radiologist",
+    "Rheumatologist",
+    "Cardiothoracic Surgeon",
+    "Dentist",
+    "Gynecologist",
+    "Hepatologist",
+    "Osteopath",
+    "Plastic Surgeon",
+    "Podiatrist",
+    "Thoracic Surgeon",
+    "Vascular Surgeon"];
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -164,7 +164,7 @@ function Doctor() {
       department: "",
       specialization: [],
       contactNumber: "",
-      email: "",
+      email: userObj.email,
       // workingHours: "",
       // availability: [],
       // averageRating: "",
@@ -211,7 +211,7 @@ function Doctor() {
           setLoading(false);
           console.log("profile setup successful:", response.data);
           const { user, token } = response.data.data
-          console.log({user,token})
+          console.log({ user, token })
           login(user, token);
           router.push("/");
         } else {
@@ -349,6 +349,7 @@ function Doctor() {
                     label="Email Address"
                     name="email"
                     required
+                    disabled
                     type="email"
                     error={!!(formik.touched.email && formik.errors.email)}
                     helperText={formik.touched.email && formik.errors.email}
@@ -382,7 +383,7 @@ function Doctor() {
 
 function Patient() {
   const [loading, setLoading] = useState(false)
-  const { token ,login} = useBearStore();
+  const { token, login } = useBearStore();
   const router = useRouter();
 
   const formik = useFormik({
@@ -428,9 +429,10 @@ function Patient() {
         if (response.status === 201) {
           console.log("profile setup successful:", response.data);
           setLoading(false);
-          const { user, token } = response.data.data;
-          login(user, token);
-          router.push("/");
+          // const { user, token } = response.data.data;
+          // login(user, token);
+          // router.push("/");
+          router.push("https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=772087817009-c8ucpi0k5vtlot4fg2aeqse22k13mttl.apps.googleusercontent.com&redirect_uri=http://localhost:3000/google/code&scope=https://www.googleapis.com/auth/calendar.events&access_type=offline&prompt=consent")
           // alert("Success!!! please log back in again");
         } else {
           helpers.setStatus({ success: false });

@@ -82,7 +82,7 @@ const Page = () => {
             createData(
               row.authId._id,
               row.fullName,
-              row.email,
+              row.authId.email,
               row.authId.role,
               row.contactNumber,
               row.authId.status
@@ -172,7 +172,8 @@ const Page = () => {
                 }
                 sx={{ maxWidth: 500 }}
               />
-            </Card>            <HassTable columns={columns} rows={filteredRows || rows} setReFectch={setReFectch} />
+            </Card>  
+          <HassTable columns={columns} rows={filteredRows || rows} setReFectch={setReFectch} />
           </Stack>
         </Container>
       </Box>

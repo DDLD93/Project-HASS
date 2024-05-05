@@ -15,6 +15,7 @@ const reviewRoutes = require("./route/review.route");
 const roomsRoutes = require("./route/room.route");
 const authRoutes = require("./route/auth.route");
 const geminiRoutes = require("./route/gemini.route");
+const calenderRoutes = require("./route/google.route");
 const { initializeSocket } = require("./connection/socket.connection");
 
 initializeSocket(server);
@@ -29,13 +30,14 @@ app.use("/api/v1/review", reviewRoutes());
 app.use("/api/v1/room", roomsRoutes());
 app.use("/api/v1/auth", authRoutes());
 app.use("/api/v1/gemini", geminiRoutes());
+app.use("/api/v1/calender", calenderRoutes());
 
 server.listen(appPort, () => {
   console.log("App listening on port: " + appPort);
 });
 
 setTimeout(() => {
-  // require("./controller/mockData.controller");
+  require("./controller/mockData.controller");
 }, 10000);
 
 module.exports = { app };

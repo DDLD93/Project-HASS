@@ -3,12 +3,6 @@ const bcrypt = require("bcrypt");
 
 const authSchema = new mongoose.Schema(
   {
-    // name: {
-    //   type: String,
-    // },
-    // phone: {
-    //   type: String,
-    // },
     email: {
       index: true,
       unique: true,
@@ -27,7 +21,7 @@ const authSchema = new mongoose.Schema(
     token: {
       access_token: { type: String },
       refresh_token: { type: String },
-      expiry_date: { type: Date },
+      expiry_date: { type: Number },
     },
     role: {
       type: String,

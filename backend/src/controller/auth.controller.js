@@ -160,14 +160,19 @@ class ControllerAuth {
       data: [...patients, ...doctors],
       message: "Users fetched successfully",
     };
-
+  }
+  async getUser(id) {
+    const user = await AuthModel.findById(id);
+    return {
+      ok: true,
+      data: user,
+      message: "User fetched successfully",
+    };
   }
 
   async updateUser(id, newData) {
     try {
-      console.log({id, newData})
       const user = await AuthModel.findByIdAndUpdate(id, newData, { new: true });
-      console.log({user})
       return {
         ok: true,
         data: user,
@@ -231,7 +236,7 @@ class ControllerAuth {
           ]),
           authType: faker.helpers.arrayElement(["local"]),
           isVerified: true,
-          status:"active"
+          status: "active"
         });
         await newUser.save();
         console.log(`User ${i + 1} created successfully`);

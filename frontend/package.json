@@ -5,7 +5,7 @@
   "licence": "MIT",
   "private": false,
   "scripts": {
-    "dev": "next",
+    "dev": "npm install && next",
     "build": "next build",
     "start": "next start",
     "export": "next export",
