@@ -252,7 +252,7 @@ function Page() {
                   )}
                   <Stack direction="row" spacing={2}>
                     {/* {selectedAppointment.status === "Pending" && <Button variant="contained" sx={{ width: "35%", }}>Reschedule</Button>} */}
-                    {appointment.status === "Pending" && <Button onClick={handleCancel} disabled={loading} color="error" variant="contained" fullWidth>Cancel</Button>}
+                    {appointment.status === "Confirmed" && <Button onClick={handleCancel} disabled={loading} color="error" variant="contained" fullWidth>Cancel</Button>}
                     {appointment.status === "Completed" && <ReviewModal openReview={openReview} setOpenReview={setOpenReview} Obj={selectedAppointment} />}
                   </Stack>
                 </Box>

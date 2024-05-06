@@ -33,12 +33,14 @@ class GoogleController {
 
     async refreshToken(id) {
         try {
-            const { data: user } = await UserCtrl.getUser(id);
-            if (!user.token.refresh_token) throw new Error(message);
-            const tokenInfo = await this.oAuth2Client.refreshToken(user.token.refresh_token);
-            const expiryDate = new Date().getTime() + (tokenInfo.expiry_date * 1000);
+            const {ok:okay, data: user,message:msg } = await UserCtrl.getUser(id);
+            if (!okay) throw new Error(msg);
+
+            if (!user.token.refresh_token) throw new Error("refrest token not inluded in user schema");
+            const {tokens} = await this.oAuth2Client.refreshToken(user.token.refresh_token);
+            const expiryDate = new Date().getTime() + (tokens.expiry_date * 1000);
             const newToken = {
-                access_token: tokenInfo.access_token,
+                access_token: tokens.access_token,
                 refresh_token: user.token.refresh_token,
                 expiry_date: expiryDate,
             };
@@ -61,7 +63,7 @@ class GoogleController {
                 resource: event,
             });
 
-            return res.data.htmlLink;
+            return res
         } catch (error) {
             console.error("Error adding event:", error);
             throw new Error(`Error adding event: ${error.message}`);

@@ -11,11 +11,6 @@ const RecurrenceSchema = new mongoose.Schema({
 }, { _id: false });
 
 const appointmentSchema = new mongoose.Schema({
-    transactionId: {
-        type: String,
-        // required: true,
-        // unique: true
-    },
     patientId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Patient',
