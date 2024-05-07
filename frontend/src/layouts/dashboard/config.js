@@ -29,7 +29,16 @@ export const items = [
       </SvgIcon>
     )
   },
-
+  {
+    title: 'Search',
+    path: '/search',
+    role:["admin"],
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
   {
     title: "Appointments",
     path: "/appointments",
