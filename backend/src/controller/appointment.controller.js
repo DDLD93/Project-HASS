@@ -16,7 +16,6 @@ class AppointmentController {
       const startTime = new Date(start);
       const endTime = new Date(add30Minutes(start));
 
-      console.log({ specialization, startTime, endTime });
       // Find doctors with the specialization, checking for conflicts directly
       const availableDoctors = await DoctorModel.findOne({
         department: specialization,
@@ -320,14 +319,14 @@ class AppointmentController {
       return { ok: false, message: error.message };
     }
   }
-  async vectorSearch(queryVector) {
+  async vectorSearch({query}) {
     try {
       const appointments = await AppointmentModel.aggregate([
         {
           $vectorSearch: {
             index: "vector_index",
             path: "purposeEmbeddings",
-            queryVector: queryVector,
+            queryVector: query,
             numCandidates: 100,
             limit: 5
           },
@@ -419,16 +418,17 @@ class AppointmentController {
 
   //     for (let i = 0; i < patientRecords.length; i++) {
   //       const patientRecord = patientRecords[i];
-
+  //       const { ok, data, message } = await OpenAICtrl.getEmbeddings()
+  //       if (!ok) throw new Error(message);
   //       const newPatient = new AppointmentModel({
-  //         patientId: patientRecord._id
-  //         doctorId
-  //         doctor
-  //         roomId
-  //         start
-  //         end
-  //         purpose
-  //         purposeEmbeddings
+  //         patientId: patientRecord._id,
+  //         doctorId,
+  //         doctor,
+  //         roomId,
+  //         start,
+  //         end,
+  //         purpose,
+  //         purposeEmbeddings: data
   //       });
 
   //       await newPatient.save();

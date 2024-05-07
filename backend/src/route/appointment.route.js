@@ -33,6 +33,20 @@ module.exports = () => {
             res.status(500).json({ ok: false, message: error.message })
         }
     });
+    api.post("/search", async (req, res) => {
+        try {
+            let body = req.body;
+            const { ok, data, message } = await AppointmentsController.vectorSearch(body);
+            if (ok) {
+                res.status(200).json({ ok, data })
+            } else {
+                res.status(500).json({ ok, message })
+            }
+        } catch (error) {
+            res.status(500).json({ ok: false, message: error.message })
+        }
+    });
+
 
     api.get("/",verifyToken, async (req, res) => {
         try {
